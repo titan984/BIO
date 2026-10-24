@@ -2,6 +2,7 @@ import "./Bio_page.css"
 import avaImg from './ava.png';
 import { useEffect, useRef } from 'react';
 import 'boxicons/css/boxicons.min.css';
+import { Footer } from "./Footer";
 
 function Bio_page() {
     const canvasRef = useRef(null);
@@ -56,7 +57,7 @@ function Bio_page() {
 
             // Считаем, сколько точек находится в радиусе мышки
             let particlesNearMouse = 0;
-            const maxNearMouse = 8;
+            const maxNearMouse = 5;
 
             if (mouse.x !== null && mouse.y !== null) {
                 particles.forEach((p) => {
@@ -159,36 +160,58 @@ function Bio_page() {
     }, []);
 
     return (
-        <section className="bio">
-            {/* КАНВАС ДЛЯ ЧАСТИЦ */}
-            <canvas ref={canvasRef} className="bio__particles"></canvas>
+        <>
+            <section className="bio">
+                {/* КАНВАС ДЛЯ ЧАСТИЦ */}
+                <canvas ref={canvasRef} className="bio__particles"></canvas>
 
-            <div className="container">
-                <div className="bio__wrap">
-                    <div className="bio__card">
-                        <div className="bio__img-wrap">
-                            <img src={avaImg} alt="avatar" className="bio__img" />
+                <div className="container">
+                    <div className="bio__wrap">
+                        <div className="bio__card">
+                            <p className="bio__card-name">Developer</p>
+                            <div className="bio__img-wrap">
+                                <img src={avaImg} alt="avatar" className="bio__img" />
+                            </div>
+                            <p className="bio__card-name">Алексей Лунёв</p>
                         </div>
-                        <p className="bio__card-name">Алексей Лунёв</p>
-                    </div>
-                    <div className="bio__links">
-                        <a className="bio__tg" href="https://t.me/Nammename" target="_blank" rel="noreferrer">
-                            <i className="bx bxl-telegram"></i> @Nammename
-                        </a>
-                        <a className="bio__vk" href="https://vk.com/id556647351" target="_blank" rel="noreferrer">
-                            <i className="bx bxl-vk"></i> Алексей Лунёв
-                        </a>
-                        <a className="bio__mail" href="mailto:lunev_alexy@mail.ru">
-                            <i className="bx bx-envelope"></i> lunev_alexy@mail.ru
-                        </a>
-                        <a className="bio__number" href="tel:+79127737701">
-                            <i className="bx bx-phone"></i> +7 912 773 7701
-                        </a>
-                        <a className="bio__more-button" href="#more">О работе</a>
+                        <div className="bio__links">
+                            <a className="bio__tg" href="https://t.me/Nammename" target="_blank" rel="noreferrer">
+                                <i className="bx bxl-telegram"></i> @Nammename
+                            </a>
+                            <a className="bio__vk" href="https://vk.com/id556647351" target="_blank" rel="noreferrer">
+                                <i className="bx bxl-vk"></i> Алексей Лунёв
+                            </a>
+                            <a className="bio__mail" href="mailto:lunev_alexy@mail.ru">
+                                <i className="bx bx-envelope"></i> lunev_alexy@mail.ru
+                            </a>
+                            <a className="bio__number" href="tel:+79127737701">
+                                <i className="bx bx-phone"></i> +7 912 773 7701
+                            </a>
+                            <a className="bio__more-button" href="#more">О работе</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+            <Footer/>
+            {/* <section className="footer">
+                <div className="footer__container">
+                    <div className="footer__wrap">
+                    <ul className="footer__list">
+                        <li className="footer__item">HTML</li>
+                        <li className="footer__item">CSS</li>
+                        <li className="footer__item">SASS</li>
+                        <li className="footer__item">BEM</li>
+                        <li className="footer__item">JavaScript</li>
+                        <li className="footer__item">TypeScript</li>
+                        <li className="footer__item">React</li>
+                        <li className="footer__item">NodeJs</li>
+                        <li className="footer__item">Python</li>
+                    </ul>
+
+                    </div>
+                </div>
+            </section> */}
+        </>
     )
 }
 

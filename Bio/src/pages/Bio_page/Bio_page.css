@@ -91,7 +91,7 @@ html, body {
 /* Левый блок: Карточка с Аватаром (Скруглена со всех сторон, без границ!) */
 .bio__card {
   background-color: var(--left-block-bg);
-  padding: 50px 40px;
+  padding: 30px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;

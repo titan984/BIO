@@ -1,0 +1,107 @@
+.footer {
+  background-color: #111111;
+  padding: 40px 20px;
+  width: 100%;
+}
+
+.footer__container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer__wrap {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;    
+  gap: 24px;              
+}
+
+.footer__header {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 40%, #74c69d 70%, #40916c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Полный переход на Flexbox для безупречного центрирования нижних рядов */
+ul.footer__list {
+  display: flex !important;
+  flex-wrap: wrap;            /* Разрешаем перенос элементов на новые строки */
+  justify-content: center;    /* Магия Flexbox: центрирует элементы в каждом ряду, включая нижний! */
+  gap: 16px;                  /* Расстояние между плашками во все стороны */
+  
+  /* Полный сброс дефолтных стилей ul */
+  list-style: none !important;
+  list-style-type: none !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  
+  max-width: 900px;           /* Ограничиваем ширину, чтобы элементы красиво разбивались на 2 ряда */
+  width: 100%;
+}
+
+/* Элементы списка */
+li.footer__item {
+  list-style: none !important;
+  list-style-type: none !important;
+  
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #1a1a1a;
+  padding: 12px 20px;         /* Чуть увеличили боковые отступы для баланса */
+  border-radius: 8px;
+  border: 1px solid #2d2d2d;
+  color: #e0e0e0;
+  transition: all 0.2s ease-in-out;
+  
+  /* Фиксированная базовая ширина для одинакового размера плашек, 
+     но с возможностью сужаться на маленьких экранах */
+  flex: 0 1 140px;            
+}
+
+/* Интерактивный ховер-эффект */
+li.footer__item:hover {
+  color: #ffffff;
+  background-color: #222222;
+  border-color: var(--brand-color); 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 8px var(--brand-color);
+  transform: translateY(-2px);
+}
+
+.footer__icon {
+  font-size: 22px;
+  color: var(--brand-color); 
+}
+
+.footer__text {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 📱 АДАПТИВНОСТЬ */
+@media (max-width: 550px) {
+  ul.footer__list {
+    flex-direction: column;   /* На мобильных телефонах выстраиваем строго в один вертикальный столбик */
+    align-items: center;
+  }
+  
+  li.footer__item {
+    width: 100%;
+    max-width: 260px;         /* Ограничиваем ширину столбика */
+  }
+  
+  .footer__header {
+    font-size: 20px;
+  }
+}
