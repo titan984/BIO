@@ -259,3 +259,20 @@ html, body {
     max-width: 85%; 
   }
 }
+/* ИСПРАВЛЕНО: Глобальный фиксированный фон на весь экран */
+.global__particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none; /* Чтобы ссылки и кнопки кликались сквозь холст */
+    z-index: -1; /* Жестко опускаем под карточку и под футер */
+}
+
+/* Сама секция bio должна иметь прозрачный фон, чтобы сквозь неё были видны летающие точки */
+.bio {
+    position: relative;
+    z-index: 2;
+    background: transparent;
+}

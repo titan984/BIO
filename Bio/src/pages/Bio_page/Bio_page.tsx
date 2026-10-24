@@ -4,38 +4,56 @@ import { useEffect, useRef } from 'react';
 import 'boxicons/css/boxicons.min.css';
 import { Footer } from "./Footer";
 
-function Bio_page() {
-    const canvasRef = useRef(null);
+interface Particle {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    radius: number;
+}
+
+interface Mouse {
+    x: number | null;
+    y: number | null;
+    radius: number;
+}
+
+export default function Bio_page() {
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
-        let animationFrameId;
+        let animationFrameId: number;
+        
+        // ИСПРАВЛЕНО: Канвас теперь равен строго размеру окна браузера
         let width = (canvas.width = window.innerWidth);
         let height = (canvas.height = window.innerHeight);
 
-        const particles = [];
-        const particleCount = 50; // Количество точек
-        const connectionDistance = 100; // Дистанция для соединения линий
-        const mouse = { x: null, y: null, radius: 110 }; // Зона притяжения к мыши
+        const particles: Particle[] = [];
+        const particleCount = 100; // Твое количество точек
+        const connectionDistance = 120; // Твоя дистанция линий
+        const mouse: Mouse = { x: null, y: null, radius: 110 }; 
 
         // Создание точек
         for (let i = 0; i < particleCount; i++) {
             particles.push({
                 x: Math.random() * width,
                 y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 1.2, // Скорость по X
-                vy: (Math.random() - 0.5) * 1.2, // Скорость по Y
+                vx: (Math.random() - 0.5) * 1.2, 
+                vy: (Math.random() - 0.5) * 1.2, 
                 radius: Math.random() * 2 + 1.5,
             });
         }
 
-        // Слушатели мыши и ресайза
-        const handleMouseMove = (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
+        // ИСПРАВЛЕНО: Чистые координаты окна. Так как канвас зафиксирован, они работают идеально в любой точке сайта!
+        const handleMouseMove = (e: MouseEvent) => {
+            // e.pageX и e.pageY автоматически учитывают скролл страницы!
+            mouse.x = e.pageX;
+            mouse.y = e.pageY;
         };
 
         const handleMouseLeave = () => {
@@ -44,6 +62,7 @@ function Bio_page() {
         };
 
         const handleResize = () => {
+            if (!canvas) return;
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
         };
@@ -55,53 +74,49 @@ function Bio_page() {
         const animate = () => {
             ctx.clearRect(0, 0, width, height);
 
-            // Считаем, сколько точек находится в радиусе мышки
             let particlesNearMouse = 0;
             const maxNearMouse = 5;
 
             if (mouse.x !== null && mouse.y !== null) {
-                particles.forEach((p) => {
-                    const dx = mouse.x - p.x;
-                    const dy = mouse.y - p.y;
-                    if (Math.sqrt(dx * dx + dy * dy) < mouse.radius) {
+                const rSq = mouse.radius * mouse.radius;
+                for (let i = 0; i < particles.length; i++) {
+                    const dx = mouse.x - particles[i].x;
+                    const dy = mouse.y - particles[i].y;
+                    if (dx * dx + dy * dy < rSq) {
                         particlesNearMouse++;
                     }
-                });
+                }
             }
 
-            // Счетчик времени для анимации кружения
             const time = Date.now() * 0.002;
 
+            // Расчет физики движения
             particles.forEach((p, index) => {
                 let isAttracted = false;
 
                 if (mouse.x !== null && mouse.y !== null) {
                     const dx = mouse.x - p.x;
                     const dy = mouse.y - p.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const distSq = dx * dx + dy * dy;
 
-                    if (distance < mouse.radius) {
+                    if (distSq < mouse.radius * mouse.radius) {
+                        const distance = Math.sqrt(distSq);
                         if (particlesNearMouse <= maxNearMouse || distance < 40) {
                             isAttracted = true;
 
-                            // ДОБАВЛЕНО: Радиус орбиты теперь "дышит" (плавно сужается и расширяется во времени)
-                            // Благодаря этому линии между точками будут постоянно менять длину и двигаться
                             const baseOrbitRadius = 25 + (index % 3) * 12;
-                            const wave = Math.sin(time + index * 0.5) * 8; // Амплитуда дыхания орбиты в 8px
+                            const wave = Math.sin(time + index * 0.5) * 8; 
                             const orbitRadius = baseOrbitRadius + wave;
 
-                            // ДОБАВЛЕНО: Каждая точка вращается со своей индивидуальной скоростью (умножаем time на коэффициент)
                             const speedFactor = 0.8 + (index % 4) * 0.15;
                             const angle = time * speedFactor + index;
 
                             const targetX = mouse.x + Math.cos(angle) * orbitRadius;
                             const targetY = mouse.y + Math.sin(angle) * orbitRadius;
 
-                            // Плавное следование к постоянно меняющейся цели на орбите
                             p.x += (targetX - p.x) * 0.012;
                             p.y += (targetY - p.y) * 0.012;
 
-                            // Внутренняя микро-вибрация точки
                             p.x += (Math.random() - 0.5) * 0.3;
                             p.y += (Math.random() - 0.5) * 0.3;
                         }
@@ -117,37 +132,48 @@ function Bio_page() {
                 if (p.x > width) { p.x = width; p.vx *= -1; }
                 if (p.y < 0) { p.y = 0; p.vy *= -1; }
                 if (p.y > height) { p.y = height; p.vy *= -1; }
+            });
 
+            // БЛОК 1: ОТРИСОВКА НЕОНОВЫХ ТОЧЕК
+            ctx.save();
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#1b9e49';
+            ctx.fillStyle = 'rgba(27, 158, 73, 0.8)';
+            
+            particles.forEach((p) => {
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(27, 158, 73, 0.8)';
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = '#1b9e49';
                 ctx.fill();
-                ctx.shadowBlur = 0;
+            });
+            ctx.restore();
 
-                particles.forEach((p2) => {
-                    if (p === p2) return;
-                    const dx = p.x - p2.x;
-                    const dy = p.y - p2.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+            // БЛОК 2: ОТРИСОВКА ПАУТИНКИ ИЗ ЛИНИЙ
+            ctx.lineWidth = 0.8;
+            const connDistSq = connectionDistance * connectionDistance;
+            
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+                    
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const distSq = dx * dx + dy * dy;
 
-                    if (dist < connectionDistance) {
+                    if (distSq < connDistSq) {
+                        const dist = Math.sqrt(distSq);
                         const alpha = (1 - dist / connectionDistance) * 0.25;
                         ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
+                        ctx.moveTo(p1.x, p1.y);
                         ctx.lineTo(p2.x, p2.y);
                         ctx.strokeStyle = `rgba(27, 158, 73, ${alpha})`;
-                        ctx.lineWidth = 0.8;
                         ctx.stroke();
                     }
-                });
-            });
+                }
+            }
 
             animationFrameId = requestAnimationFrame(animate);
         };
-
-
 
         animate();
 
@@ -162,9 +188,7 @@ function Bio_page() {
     return (
         <>
             <section className="bio">
-                {/* КАНВАС ДЛЯ ЧАСТИЦ */}
                 <canvas ref={canvasRef} className="bio__particles"></canvas>
-
                 <div className="container">
                     <div className="bio__wrap">
                         <div className="bio__card">
@@ -175,44 +199,24 @@ function Bio_page() {
                             <p className="bio__card-name">Алексей Лунёв</p>
                         </div>
                         <div className="bio__links">
-                            <a className="bio__tg" href="https://t.me/Nammename" target="_blank" rel="noreferrer">
-                                <i className="bx bxl-telegram"></i> @Nammename
+                            <a className="bio__tg" href="https://t.me" target="_blank" rel="noreferrer">
+                                <i className="text-xl bx bxl-telegram"></i> @Nammename
                             </a>
-                            <a className="bio__vk" href="https://vk.com/id556647351" target="_blank" rel="noreferrer">
-                                <i className="bx bxl-vk"></i> Алексей Лунёв
+                            <a className="bio__vk" href="https://vk.com" target="_blank" rel="noreferrer">
+                                <i className="text-xl bx bxl-vk"></i> Алексей Лунёв
                             </a>
                             <a className="bio__mail" href="mailto:lunev_alexy@mail.ru">
-                                <i className="bx bx-envelope"></i> lunev_alexy@mail.ru
+                                <i className="text-xl bx bx-envelope"></i> lunev_alexy@mail.ru
                             </a>
                             <a className="bio__number" href="tel:+79127737701">
-                                <i className="bx bx-phone"></i> +7 912 773 7701
+                                <i className="text-xl bx bx-phone"></i> +7 912 773 7701
                             </a>
                             <a className="bio__more-button" href="#more">О работе</a>
                         </div>
                     </div>
                 </div>
             </section>
-            <Footer/>
-            {/* <section className="footer">
-                <div className="footer__container">
-                    <div className="footer__wrap">
-                    <ul className="footer__list">
-                        <li className="footer__item">HTML</li>
-                        <li className="footer__item">CSS</li>
-                        <li className="footer__item">SASS</li>
-                        <li className="footer__item">BEM</li>
-                        <li className="footer__item">JavaScript</li>
-                        <li className="footer__item">TypeScript</li>
-                        <li className="footer__item">React</li>
-                        <li className="footer__item">NodeJs</li>
-                        <li className="footer__item">Python</li>
-                    </ul>
-
-                    </div>
-                </div>
-            </section> */}
+            <Footer />
         </>
-    )
+    );
 }
-
-export default Bio_page
