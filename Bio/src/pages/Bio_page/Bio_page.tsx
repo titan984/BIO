@@ -17,7 +17,7 @@ function Bio_page() {
         let height = (canvas.height = window.innerHeight);
 
         const particles = [];
-        const particleCount = 120; // Количество точек
+        const particleCount = 50; // Количество точек
         const connectionDistance = 100; // Дистанция для соединения линий
         const mouse = { x: null, y: null, radius: 110 }; // Зона притяжения к мыши
 
