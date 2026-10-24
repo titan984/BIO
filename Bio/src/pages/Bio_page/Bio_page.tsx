@@ -18,7 +18,7 @@ function Bio_page() {
 
         const particles = [];
         const particleCount = 120; // Количество точек
-        const connectionDistance = 120; // Дистанция для соединения линий
+        const connectionDistance = 100; // Дистанция для соединения линий
         const mouse = { x: null, y: null, radius: 110 }; // Зона притяжения к мыши
 
         // Создание точек
